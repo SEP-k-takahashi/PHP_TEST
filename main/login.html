@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>sample</title>
+ <meta http-equiv="content-type" charset="utf-8">
+ <link rel="stylesheet" href="../style.css">
+</head>
+<?php
+
+
+if(isset($_POST['user'])){
+$user = $_POST['user'];
+}
+
+if(isset($_POST['pass'])){
+    $pass = $_POST['pass'];
+    }
+
+    try{
+        $pdo = new PDO('mysql:dbname=kt-works;host=localhost', 'root', 'ujoi8zmk');
+    
+    
+        $pdo->query('SET NAMES sjis');
+    
+        $sql = 'select count(*) num from login where user = ? and pass = ?';
+        $stmtcnt = $pdo->prepare($sql);
+        $stmtcnt->execute([$user, $pass]);
+
+     
+        if($stmtcnt->fetchColumn() > 0 ){
+           
+            $sql = 'select * from login where user = ? and pass = ?';
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$user, $pass]);
+
+            foreach ($stmt as $row) {
+                print($row['id']).'<br>';
+                print($row['user'].'<br>');
+                print($row['pass'].'<br>');
+            }
+            
+        }else{
+            echo '失敗';
+        }
+    }catch (PDOException $e){
+        print('Error:'.$e->getMessage());
+        die();
+    }
+
+?>
+<body>
+	<div align="center" >
+		<form action = "main/login.html" method = "post">
+			<p>KT-WORKS</p>
+			<table class="mypage">
+				<tr>
+					<th>ユーザー名</th>
+					<td><input type="text" name="user" ></td>
+				</tr>
+				<tr>
+					<th>パスワード</th>
+					<td><input type="text" name="pass" ></td>
+				</tr>			
+			</table>
+		    <div align="center" >
+			    <input type="submit" name="login" value="ログイン">
+		    </div >
+        </form>
+    </div>
+</body>
