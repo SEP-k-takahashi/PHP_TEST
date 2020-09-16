@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
- <title>sample</title>
+ <title>ログイン画面</title>
  <meta http-equiv="content-type" charset="utf-8">
  <link rel="stylesheet" href="style.css">
 </head>
@@ -24,4 +24,14 @@
 			<input type="submit" name="login" value="ログイン">
 		</div >
 	</form>
+
+	<div align="center"  class="errmsg">
+		<P>
+		<?php
+		if(isset($_GET['error'])){
+			echo 'ログインに失敗しました';
+			}
+		?>
+		</P>
+	</div >
 </body>

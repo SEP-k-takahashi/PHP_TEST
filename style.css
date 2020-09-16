@@ -11,3 +11,9 @@
   padding: 10px;
   margin: 10px;
 }
+.errmsg {
+  /*真ん中の要素*/
+  color: red;
+  padding: 10px;
+  margin: 10px;
+}

@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
- <title>sample</title>
+ <title>一覧</title>
  <meta http-equiv="content-type" charset="utf-8">
  <link rel="stylesheet" href="../style.css">
 </head>
 <?php
-
-
+$err = 'err';
+$loginName = '';
+require_once("../common/common.php");
 if(isset($_POST['user'])){
 $user = $_POST['user'];
 }
@@ -17,45 +18,80 @@ if(isset($_POST['pass'])){
     }
 
     try{
-        $pdo = new PDO('mysql:dbname=kt-works;host=localhost', 'root', 'ujoi8zmk');
+
+        //ログイン情報取得
+       $pdo = DB_open();
     
-    
-        $pdo->query('SET NAMES sjis');
-    
-        $sql = 'select count(*) num from login where user = ? and pass = ?';
+        $sql = 'select count(*) num from t_login where user = ? and pass = ?';
         $stmtcnt = $pdo->prepare($sql);
         $stmtcnt->execute([$user, $pass]);
 
      
         if($stmtcnt->fetchColumn() > 0 ){
            
-            $sql = 'select * from login where user = ? and pass = ?';
+            //$sql = 'select * from t_login where user = ? and pass = ?';
+            $sql = 'SELECT name ' 
+                  .'FROM   t_user u ,t_login l '
+                  .'WHERE  u.id = l.id '
+                  .'AND    l.user = ? And l.pass = ?';
+      
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$user, $pass]);
 
             foreach ($stmt as $row) {
-                print($row['id']).'<br>';
-                print($row['user'].'<br>');
-                print($row['pass'].'<br>');
+                $loginName = $row['name'];
+
             }
             
         }else{
-            echo '失敗';
+            header('Location: ../index.html?error='. $err);
+            die ();
         }
+
+        $sql = 'SELECT u.id,u.name ' 
+        .'FROM   t_user u ,t_login l '
+        .'WHERE  u.id = l.id ';
+
+        $stmt = $pdo->query($sql);
+        $members = array();
+
+        foreach ($stmt as $row) {
+            $members[] = $row;
+        }
+
     }catch (PDOException $e){
         print('Error:'.$e->getMessage());
         die();
-    }
+    } 
 
 ?>
 <body>
-	<div align="center" >
+	<div align="left"" >
+        <p><?php echo $loginName; ?>さんがログインしました。</p>
+        <form action="../add/addform.html"　method="post" name="add" >
+            <input type="submit" name="addbtn" value="新規登録" >
+        </form>
+        <form name="list">
+            <table>
+                <?php 
+                foreach ($members as $row) {
+                ?>
+                <tr>
+                    <td><?php echo $row['id']; ?></td>
+                    <td><?php echo $row['name']; ?></td>
+                </tr>
+                <?php
+                }
+                ?>
+            </table>
+        </form>
+<!--
 		<form action = "main/login.html" method = "post">
 			<p>KT-WORKS</p>
 			<table class="mypage">
 				<tr>
 					<th>ユーザー名</th>
-					<td><input type="text" name="user" ></td>
+					<td><input type="text" name="user" value="<?php echo $user; ?>"</td>
 				</tr>
 				<tr>
 					<th>パスワード</th>
@@ -66,5 +102,6 @@ if(isset($_POST['pass'])){
 			    <input type="submit" name="login" value="ログイン">
 		    </div >
         </form>
+-->
     </div>
 </body>
