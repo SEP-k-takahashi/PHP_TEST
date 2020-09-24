@@ -1,57 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ログイン画面</title>
+    <title>登録画面</title>
     <meta http-equiv="content-type" charset="utf-8">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
 </head>
+<?php
+session_start();
+$loginName = $_SESSION['username'];
+?>
 <body>
-    <form>
-        <table>
-            <tr>
-                <td>名前</td>
-                <td><input type="text" name="name"></td>
-            </tr>
-            <tr>
-                <td>年齢</td>
-                <td><input type="text" name="name"></td>
-            </tr>
-            <tr>
-                <td>性別</td>
-                <td><input type="text" name="name"></td>
-            </tr>
-            <tr>
-                <td>出身地</td>
-                <td><input type="text" name="name"></td>
-            </tr>
-            <tr>
-                <td>趣味1</td>
-                <td>補足</td>
-            </tr>
-            <tr>
-                <td><input type="text" name="hobby1"></td>
-                <td><input type="text" name="hobbyd1"></td>
-            </tr>            
-            <tr>
-                <td>趣味2</td>
-                <td>補足</td>
-            </tr>
-            <tr>
-                <td><input type="text" name="hobby2"></td>
-                <td><input type="text" name="hobbyd2"></td>
-            </tr>                 
-            <tr>
-                <td>趣味3</td>
-                <td>補足</td>
-            </tr>
-            <tr>
-                <td><input type="text" name="hobby3"></td>
-                <td><input type="text" name="hobbyd3"></td>
-            </tr>   
-            <tr>
-                <td>一言</td>
-                <td><input type="text" name="name"></td>
-            </tr>
-        </table>
-    </form>
+    <header>
+        <div class="hd_user">
+            <p ><?php echo $loginName; ?>さん</p>
+        </div>
+    </header>    
+    <div class="main">
+        <div class ="inputfomrs" align="center">
+            <form action="addcommit.html" method="POST">
+                <table >
+                    <tr >
+                        <td>ユーザー名</td>
+                        <td><input type="text" name="user"></td>
+                    </tr>
+                    <tr>
+                        <td>パスワード</td>
+                        <td><input type="password" name="pass"></td>
+                    </tr>
+                    <tr>
+                        <td>名前</td>
+                        <td><input type="text" name="name"></td>
+                    </tr>
+                </table>
+                <br>
+                <input type="submit"  name="addcommit" value="登録">
+                <input type="submit"  name="back" value="戻る" onClick="form.action='../main/login.html';return true">
+            </form>
+        </div>
+    </div>
 </body>

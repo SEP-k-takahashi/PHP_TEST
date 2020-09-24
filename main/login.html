@@ -6,102 +6,116 @@
  <link rel="stylesheet" href="../style.css">
 </head>
 <?php
+session_start();
+
 $err = 'err';
 $loginName = '';
 require_once("../common/common.php");
-if(isset($_POST['user'])){
-$user = $_POST['user'];
-}
 
-if(isset($_POST['pass'])){
-    $pass = $_POST['pass'];
+if(!isset($_SESSION['username'])){
+    if(isset($_POST['user'])){
+        $user = $_POST['user'];
+        }    
+    if(isset($_POST['pass'])){
+        $pass = $_POST['pass'];
     }
 
     try{
 
-        //ログイン情報取得
-       $pdo = DB_open();
-    
-        $sql = 'select count(*) num from t_login where user = ? and pass = ?';
+            //ログイン情報取得
+        $pdo = DB_open();
+        
+        $sql = 'select count(*) num from t_login where user = ? and pass = ?' ;
         $stmtcnt = $pdo->prepare($sql);
         $stmtcnt->execute([$user, $pass]);
 
-     
-        if($stmtcnt->fetchColumn() > 0 ){
-           
-            //$sql = 'select * from t_login where user = ? and pass = ?';
-            $sql = 'SELECT name ' 
-                  .'FROM   t_user u ,t_login l '
-                  .'WHERE  u.id = l.id '
-                  .'AND    l.user = ? And l.pass = ?';
-      
+        
+         if($stmtcnt->fetchColumn() > 0 ){
+ 
+           $sql = 'SELECT name ' 
+                .'FROM   t_user u ,t_login l '
+                .'WHERE  u.id = l.id '
+                .'AND    l.user = ? And l.pass = ?';
+        
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$user, $pass]);
+             $stmt->execute([$user, $pass]);
 
-            foreach ($stmt as $row) {
-                $loginName = $row['name'];
+             foreach ($stmt as $row) {
+                  $loginName = $row['name'];
 
             }
-            
+
+            $_SESSION['username'] = $loginName;
         }else{
-            header('Location: ../index.html?error='. $err);
+             header('Location: ../index.html?error='. $err);
             die ();
         }
 
+
+
+    }catch (PDOException $e){
+            print('Error:'.$e->getMessage());
+            die();
+    } 
+}else{
+    $loginName = $_SESSION['username'];
+}
+    try{
+        //ログイン情報取得
+        $pdo = DB_open();
         $sql = 'SELECT u.id,u.name ' 
         .'FROM   t_user u ,t_login l '
-        .'WHERE  u.id = l.id ';
+        .'WHERE  u.id = l.id order by id';
 
         $stmt = $pdo->query($sql);
         $members = array();
 
         foreach ($stmt as $row) {
             $members[] = $row;
-        }
-
+        }  
     }catch (PDOException $e){
         print('Error:'.$e->getMessage());
         die();
     } 
-
 ?>
 <body>
-	<div align="left"" >
-        <p><?php echo $loginName; ?>さんがログインしました。</p>
+
+    <header>
+        <div class="hd_user">
+            <p ><?php echo $loginName; ?>さん</p>
+        </div>
+    </header>
+
+ 
+	<div class="maintable">
+
         <form action="../add/addform.html"　method="post" name="add" >
             <input type="submit" name="addbtn" value="新規登録" >
         </form>
-        <form name="list">
-            <table>
-                <?php 
-                foreach ($members as $row) {
-                ?>
-                <tr>
-                    <td><?php echo $row['id']; ?></td>
-                    <td><?php echo $row['name']; ?></td>
-                </tr>
-                <?php
-                }
-                ?>
-            </table>
+                <table border="1"  width="100%">
+                    <tr bgcolor="gray">
+                        <th>ID</th>
+                        <th>名前</th>
+                        <th></th>
+                    </tr>
+                    <form action="../add/addform.html"　method="post" name="add" >
+                    <?php 
+                    foreach ($members as $row) {
+                    ?>
+                        <tr>
+                            <td><?php echo $row['id']; ?></td>
+                            <td><?php echo $row['name']; ?></td>
+                            <td><input type="submit"  name="edit" value="編集" onClick="form.action='../edit/editform.html';return true">
+                            </td>
+                        </tr>
+                    </form>
+                    <?php
+                    }
+                    ?>
+
+                </table>
+
         </form>
-<!--
-		<form action = "main/login.html" method = "post">
-			<p>KT-WORKS</p>
-			<table class="mypage">
-				<tr>
-					<th>ユーザー名</th>
-					<td><input type="text" name="user" value="<?php echo $user; ?>"</td>
-				</tr>
-				<tr>
-					<th>パスワード</th>
-					<td><input type="text" name="pass" ></td>
-				</tr>			
-			</table>
-		    <div align="center" >
-			    <input type="submit" name="login" value="ログイン">
-		    </div >
-        </form>
--->
+
     </div>
 </body>
